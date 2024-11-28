@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <record id="overtime_request_batch_wizard_view" model="ir.ui.view">
+            <field name="name">overtime.request.batch.view</field>
+            <field name="model">overtime.request.batch</field>
+            <field name="arch" type="xml">
+                <form string="Overtime Batch Request">
+                    <sheet>
+                        <group>
+                            <field name="reason_id" options="{'no_create': True}" string="Reason" required="1"/>
+                            <field name="rule_id" options="{'no_create': True}" string="Rule" required="1"/>
+                            <label for="date_from" string="Date"/>
+                            <div >
+                                <field name="date_from" required="1" class="oe_inline" widget="daterange" options="{'related_end_date': 'date_to'}" placeholder="From"/>
+                                -
+                                <field name="date_to" required="1" class="oe_inline" widget="daterange" options="{'related_start_date': 'date_from'}" placeholder="To"/>
+                            </div>
+                        </group>
+                        <group string="Employee(s)">
+                            <field name="employee_ids" nolabel="1" colspan="2" required="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="generate_overtime_batch" string="Generate" icon="fa-cog" type="object" class="oe_highlight"/>
+                        <button string="Cancel" type="object" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="overtime_request_batch_wizard_action" model="ir.actions.act_window">
+            <field name="name">Overtime Batch Request</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">overtime.request.batch</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="nti_overtime.overtime_request_batch_wizard_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="overtime_request_batch_menu" name="Request Batch" action="overtime_request_batch_wizard_action"
+            parent="root_overtime_menu" groups="nti_overtime.group_ovt_request_batch" sequence="3" />
+
+    </data>
+
+
+</odoo>

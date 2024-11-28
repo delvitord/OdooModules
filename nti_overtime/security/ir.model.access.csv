@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_overtime_user,nti_overtime.hr.overtime.user,nti_overtime.model_hr_overtime,nti_overtime.group_overtime_user,1,0,0,0
+access_hr_overtime_manager,nti_overtime.hr.overtime.manager,nti_overtime.model_hr_overtime,nti_overtime.group_overtime_manager,1,1,0,0
+access_hr_overtime_admin,nti_overtime.hr.overtime.admin,nti_overtime.model_hr_overtime,nti_overtime.group_overtime_admin,1,1,1,1
+
+access_overtime_reason_user,nti_overtime.overtime.reason,model_overtime_reason,nti_overtime.group_overtime_user,1,0,0,0
+access_overtime_reason_adminstrator,nti_overtime.overtime.reason.adminstrator,model_overtime_reason,nti_overtime.group_overtime_admin,1,1,1,1
+access_overtime_rule_user,nti_overtime.overtime.rule,model_overtime_rule,nti_overtime.group_overtime_user,1,0,0,0
+access_overtime_rule_adminstrator,nti_overtime.overtime.rule.adminstrator,model_overtime_rule,nti_overtime.group_overtime_admin,1,1,1,1
+access_overtime_rule_line_user,nti_overtime.overtime.rule.line,model_overtime_rule_line,nti_overtime.group_overtime_user,1,0,0,0
+access_overtime_rule_line_adminstrator,nti_overtime.overtime.rule.line.adminstrator,model_overtime_rule_line,nti_overtime.group_overtime_admin,1,1,1,1
+access_overtime_request_batch_user,undefined.overtime.request.batch,model_overtime_request_batch,base.group_user,1,1,1,1
+access_overtime_detail_user,undefined.overtime.detail,model_overtime_detail,base.group_user,1,1,1,1
+access_generate_overtime_recapitulation_user,nti_overtime.generate.overtime.recapitulation,model_generate_overtime_recapitulation,base.group_user,1,1,1,1

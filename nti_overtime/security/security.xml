@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+    
+        <!-- Groups -->
+        <record model="ir.module.category" id="overtime_groups">
+            <field name="name">Overtime</field>
+            <field name="parent_id" ref='base.module_category_human_resources'/>
+        </record>
+
+        <record id="group_overtime_user" model="res.groups">
+            <field name="name">Users</field>
+            <field name="category_id" ref="overtime_groups"/>
+        </record>
+
+        <record id="group_overtime_officer" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="implied_ids" eval="[(4, ref('nti_overtime.group_overtime_user'))]"/>
+            <field name="category_id" ref="overtime_groups"/>
+        </record>
+
+        <record id="group_overtime_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="implied_ids" eval="[(4, ref('nti_overtime.group_overtime_officer'))]"/>
+            <field name="category_id" ref="overtime_groups"/>
+        </record>
+
+        <record id="group_overtime_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="implied_ids" eval="[(4, ref('nti_overtime.group_overtime_manager'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]" />
+            <field name="category_id" ref="overtime_groups"/>
+        </record>
+
+        <record id="group_ovt_request_batch" model="res.groups">
+            <field name="name">Show Overtime Request Batch</field>
+        </record>
+
+        <record id="group_ovt_advanced" model="res.groups">
+            <field name="name">Advanced Overtime Features</field>
+        </record>
+
+    </data>
+    
+
+</odoo>

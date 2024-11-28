@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <!-- Views -->
+        <record id="hr_overtime_view_form" model="ir.ui.view">
+            <field name="name">hr.overtime.view.form</field>
+            <field name="model">hr.overtime</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <field name="state" widget='statusbar' statusbar_visible='draft,submit,done' />
+                        <button string="Submit" name="button_submit" type="object" class="oe_highlight" states="draft"/>
+                        <button string="Approve" groups="nti_overtime.group_overtime_manager" name="button_approve" type="object" class="oe_highlight" states="submit"/>
+                        <button string="Realized" name="button_realized" type="object" class="oe_highlight" states="approved"/>
+                        <button string="Done" name="button_done" type="object" class="oe_highlight" states="realized" groups="hr.group_hr_manager"/>
+                        <button string="Reject" name="button_reject" type="object" states="submit,approved,realized" groups="hr.group_hr_manager,nti_overtime.group_overtime_manager"/>
+                        <button string="Need Revision" name="button_draft" type="object" states="submit,approved,realized,reject" />
+                        <field name="is_realization" invisible='1'/>
+                    </header>
+                    <sheet>
+                        <field name="rule_type" invisible="1"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly='1' />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="employee_id" required='1' options="{'no_create': True, 'no_open': True}"/>
+                                <field name="reason_id" required='1' options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                            <group>
+                                <field name="job_id" />
+                                <field name="description" />
+                                <field name="rule_id" force_save="1" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                        </group>
+                        <group >
+                            <group string="Request">
+                                <label for="req_start" string="Date"/>
+                                <div >
+                                    <field name="req_start" required="1" class="oe_inline" attrs="{'readonly': [('state','!=','draft')]}" widget="daterange" options="{'related_end_date': 'req_end'}" placeholder="From"/>
+                                    -
+                                    <field name="req_end" required="1" class="oe_inline" attrs="{'readonly': [('state','!=','draft')]}" widget="daterange" options="{'related_start_date': 'req_start'}" placeholder="To"/>
+                                </div>
+                            </group>
+                            <group string="Realization" attrs="{'invisible': [('is_realization','=',False)]}">
+                                <label for="real_start" string="Date"/>
+                                <div >
+                                    <field name="real_start" class="oe_inline" attrs="{'required': [('is_realization','=',True)], 'readonly': [('state','in',['done','reject'])]}" widget="daterange" options="{'related_end_date': 'real_end'}" placeholder="From"/>
+                                    -
+                                    <field name="real_end" class="oe_inline" attrs="{'required': [('is_realization','=',True)], 'readonly': [('state','in',['done','reject'])]}" widget="daterange" options="{'related_start_date': 'real_start'}" placeholder="To"/>
+                                </div>
+                                <field name="break_time" attrs="{'readonly': [('state','in',['done','reject'])]}"/>
+                                <field name="is_back_payment" attrs="{'readonly': [('state','in',['done','reject'])]}" groups="nti_overtime.group_ovt_advanced"/>
+                                <field name="payment_date" attrs="{'required': [('is_back_payment','=',True)], 'invisible': [('is_back_payment','!=',True)], 'readonly': [('state','in',['done','reject'])]}" groups="nti_overtime.group_ovt_advanced"/>
+                            </group>
+                        </group>
+                        <group string="Total Amount" attrs="{'invisible': ['|', ('is_realization','=', False), ('rule_type','!=','fix')]}">
+                            <field name="total_amount" groups="nti_overtime.group_ovt_advanced" readonly='1' force_save='1'/>
+                        </group>
+                        <group string="Computation" attrs="{'invisible': ['|', ('is_realization','=', False), ('rule_type','=','fix')]}">
+                            <group>
+                                <field name="total_ovt"/>
+                                <field name="total_amount" groups="nti_overtime.group_ovt_advanced" force_save="1" readonly="1"/>
+                                <button name="compute_amount" groups="nti_overtime.group_ovt_advanced" type="object" string="Compute" attrs="{'invisible': ['|', ('is_realization','=', False), ('state','=', 'done')]}" class="oe_link oe_edit_only oe_inline"/>
+                            </group>
+                            <group>
+                                <field name="final_total_hours" force_save="1" readonly="1"/>
+                                <field name="hourly_pay" readonly="1" force_save="1" groups="nti_overtime.group_ovt_advanced" attrs="{'invisible': [('rule_type','=', 'base')]}"/>
+                            </group>
+                        </group>
+                        <notebook groups="nti_overtime.group_ovt_advanced">
+                            <page string="Details" attrs="{'invisible': ['|', ('is_realization','=', False), '|', ('rule_type','=','fix'), ('rule_type','=','base')]}">
+                                <field name="overtime_detail_line_ids" options="{'no_open': True}" force_save="1" readonly="1" >
+                                    <tree>
+                                        <field name="overtime_id" invisible="1"/>
+                                        <field name="overtime_hour"/>
+                                        <field name="total" sum="Total"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="overtime_rule_view_form" model="ir.ui.view">
+            <field name="name">overtime.rule.view.form</field>
+            <field name="model">overtime.rule</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" required='1'/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type" required='1'/>
+                                <field name="overtime_rounding" attrs="{'invisible': ['|', ('rounding_type','=','actual'), '|', ('type','=','fix'), ('type','=','base')], 'required': [('rounding_type','!=','actual')]}"/>
+                                <field name="is_public_holiday" />
+                            </group>
+                            <group>
+                                <field name="rounding_type" required='1' attrs="{'invisible': ['|', ('type','=','fix'), ('type','=','base')]}"/>
+                                <label for="minute" attrs="{'invisible': ['|', ('rounding_type','=','actual'),'|',('overtime_rounding','!=','custom'),('type','!=','rule')]}"/>
+                                <div class="o_row" name="minute" attrs="{'invisible': ['|', ('rounding_type','=','actual'),'|',('overtime_rounding','!=','custom'),('type','!=','rule')]}">
+                                    <field name="minute"/>
+                                    <span>minute(s)</span>
+                                </div>
+                                <field name="fix_amount" attrs="{'invisible': [('type','!=','fix')]}"/>
+                                <field name="base_amount" attrs="{'invisible': [('type','!=','base')]}"/> 
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="rules" string="Rules" attrs="{'invisible': [('type','=','base')]}">
+                                <field name="line_ids" attrs="{'invisible': [('type','=','fix')]}">
+                                    <tree editable='bottom'>
+                                        <field name="name" required='1'/>
+                                        <field name="overtime_hour" required='1'/>
+                                        <field name="multiplier" required='1'/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page name="applicability" string="Aplicability">
+                                <separator string="Job Position"/>
+                                <field name="job_ids" />
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="overtime_rule_view_tree" model="ir.ui.view">
+            <field name="name">overtime.rule.view.tree</field>
+            <field name="model">overtime.rule</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name" />
+                    <field name="is_public_holiday" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="overtime_reason_view_tree" model="ir.ui.view">
+            <field name="name">overtime.reason.view.tree</field>
+            <field name="model">overtime.reason</field>
+            <field name="arch" type="xml">
+                <tree editable='bottom'>
+                    <field name="name" required='1'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="hr_overtime_view_tree" model="ir.ui.view">
+            <field name="name">hr.overtime.view.tree</field>
+            <field name="model">hr.overtime</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name" />
+                    <field name="employee_id" />
+                    <field name="reason_id" />
+                    <field name="req_start" />
+                    <field name="req_end" />
+                    <field name="real_start" />
+                    <field name="real_end" />
+                    <field name="state" widget="badge" decoration-success="state == 'done'" decoration-info="state not in ['draft', 'done']"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Sequence -->
+        <record id="seq_hr_overtime" model="ir.sequence">
+            <field name="name">Overtime Sequence</field>
+            <field name="code">hr.overtime</field>
+            <field name="prefix">OVT/%(y)s/%(month)s/</field>
+            <field name="padding">5</field>
+        </record>
+
+        <!-- Action -->
+        <record id="overtime_request_action" model="ir.actions.act_window">
+            <field name="name">Overtime Request</field>
+            <field name="res_model">hr.overtime</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_realization', '=', False)]</field>
+        </record>
+
+        <record id="overtime_realization_action" model="ir.actions.act_window">
+            <field name="name">Overtime Realization</field>
+            <field name="res_model">hr.overtime</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_realization', '=', True)]</field>
+        </record>
+
+        <record id="overtime_reason_action" model="ir.actions.act_window">
+            <field name="name">Overtime Reason</field>
+            <field name="res_model">overtime.reason</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <record id="overtime_rule_action" model="ir.actions.act_window">
+            <field name="name">Overtime Rules</field>
+            <field name="res_model">overtime.rule</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Menu Items -->
+        <menuitem id="root_overtime_menu" name="Overtime" parent="hr_attendance.menu_hr_attendance_root" sequence="3" groups="nti_overtime.group_overtime_officer" />
+
+        <menuitem id="overtime_request_menu" name="Request" action="overtime_request_action" parent="root_overtime_menu"
+            sequence="1" groups="nti_overtime.group_overtime_officer" />
+
+        <menuitem id="overtime_realization_menu" name="Realization" action="overtime_realization_action"
+            parent="root_overtime_menu" sequence="2" groups="nti_overtime.group_overtime_officer" />
+
+        <menuitem id="overtime_reason_menu" name="Reason" action="overtime_reason_action" groups="nti_overtime.group_ovt_advanced" parent="root_overtime_menu"
+            sequence="3" />
+
+        <menuitem id="overtime_rule_menu" name="Rules" action="overtime_rule_action" groups="nti_overtime.group_ovt_advanced" parent="root_overtime_menu"
+            sequence="4" />
+
+        <!-- Inherit View Form Employees -->
+        <record model="ir.ui.view" id="view_employee_view_form_inherit_nti_overtime">
+            <field name="name">view.employee.view.form.inherit.nti.overtime</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='hr_settings']" position="inside">
+                    <group name="rule" string="Overtime Rule">
+                        <field name="default_rule_ovt_id" options="{'no_create': True}"/>
+                        <field name="default_rule_hol_ovt_id" options="{'no_create': True}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record model="ir.ui.view" id="view_hr_overtime_search">
+            <field name="name">hr.overtime.search</field>
+            <field name="model">hr.overtime</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="reason_id"/>
+                    <field name="employee_id"/>
+                </search>
+            </field>
+        </record>
+
+
+    </data>
+
+
+</odoo>

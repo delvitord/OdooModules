@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+    
+        <record id="generate_overtime_recapitulation_view_form" model="ir.ui.view">
+            <field name="name">generate.overtime.recapitulation.view.form</field>
+            <field name="model">generate.overtime.recapitulation</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <label for="start_date" string="Date" />
+                            <div>
+                                <field name="start_date" class="oe_inline" required="1" widget="daterange"
+                                    options="{'related_end_date': 'end_date'}" placeholder="From" /> -
+                                <field name="end_date" class="oe_inline" required="1" widget="daterange"
+                                    options="{'related_start_date': 'start_date'}" placeholder="To" />
+                            </div>
+                    </group>
+                    <footer>
+                        <button name="download_xlsx_report"
+                            string="Generate"
+                            type="object"
+                            class="oe_highlight"
+                            />
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="generate_overtime_recapitulation_action" model="ir.actions.act_window">
+            <field name="name">Overtime Recapitulation</field>
+            <field name="res_model">generate.overtime.recapitulation</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="generate_overtime_recapitulation_action_attendance" model="ir.actions.act_window">
+            <field name="name">Overtime Recapitulation</field>
+            <field name="res_model">generate.overtime.recapitulation</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="generate_overtime_recapitulation_attendance_menu" action="generate_overtime_recapitulation_action_attendance" groups="nti_overtime.group_ovt_advanced" name="Overtime Recapitulation" parent="hr_attendance.menu_hr_attendance_report" sequence="2"/>
+
+    </data>
+    
+
+</odoo>
